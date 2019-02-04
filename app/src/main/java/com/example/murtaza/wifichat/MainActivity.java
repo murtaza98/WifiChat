@@ -43,6 +43,8 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     WifiP2pManager mManager;
     WifiP2pManager.Channel mChannel;
 
+    public static final int PORT_USED = 8889;
+
     BroadcastReceiver mReceiver;
     IntentFilter mIntentFilter;
 
@@ -73,9 +75,10 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         @Override
         public void run() {
             try {
-                serverSocket = new ServerSocket(8888);
+                serverSocket = new ServerSocket(PORT_USED);
                 socket = serverSocket.accept();
                 // start the sendReceive class
+//                Toast.makeText(getApplicationContext(), "Send Revieve started", Toast.LENGTH_SHORT).show();
                 sendReceive = new SendReceive(socket);
                 sendReceive.start();
             } catch (IOException e) {
@@ -96,8 +99,9 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         @Override
         public void run() {
             try {
-                socket.connect(new InetSocketAddress(hostAddress, 8888), 500);
+                socket.connect(new InetSocketAddress(hostAddress, PORT_USED), 500);
                 // start the sendReceive class
+//                Toast.makeText(getApplicationContext(), "Send Revieve started", Toast.LENGTH_SHORT).show();
                 sendReceive = new SendReceive(socket);
                 sendReceive.start();
             } catch (IOException e) {
@@ -113,10 +117,9 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
         public SendReceive(Socket socket){
             this.socket = socket;
-
             try {
-                this.inputStream = this.socket.getInputStream();
-                this.outputStream = this.socket.getOutputStream();
+                this.inputStream = socket.getInputStream();
+                this.outputStream = socket.getOutputStream();
             } catch (IOException e) {
                 e.printStackTrace();
             }
@@ -158,7 +161,6 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                     readMsgBox.setText(tempMessage);
                     break;
             }
-
             return true;
         }
     });
@@ -237,6 +239,8 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                 discoverDevices();
                 break;
             case R.id.sendButton:
+                if(sendReceive == null)
+                    return;
                 // send the message
                 String msg = writeMsg.getText().toString();
                 sendReceive.write(msg.getBytes());
@@ -291,11 +295,13 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
             if(info.groupFormed && info.isGroupOwner){
                 connectionStatus.setText("HOST");
-                ServerClass serverClass = new ServerClass();
+//                Toast.makeText(getApplicationContext(), "Server class started", Toast.LENGTH_SHORT).show();
+                serverClass = new ServerClass();
                 serverClass.start();
             }else if(info.groupFormed){
                 connectionStatus.setText("CLIENT");
-                ClientClass clientClass = new ClientClass(groupOwnerAddress);
+//                Toast.makeText(getApplicationContext(), "Client class started", Toast.LENGTH_SHORT).show();
+                clientClass = new ClientClass(groupOwnerAddress);
                 clientClass.start();
             }
         }
