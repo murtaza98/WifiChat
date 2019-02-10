@@ -2,6 +2,7 @@ package com.example.murtaza.wifichat;
 
 import android.content.BroadcastReceiver;
 import android.content.Context;
+import android.content.Intent;
 import android.content.IntentFilter;
 import android.net.wifi.WifiManager;
 import android.net.wifi.p2p.WifiP2pConfig;
@@ -77,10 +78,15 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
             try {
                 serverSocket = new ServerSocket(PORT_USED);
                 socket = serverSocket.accept();
+
+                startActivity(new Intent(getApplicationContext(), ChatWindow.class));
+
+                SocketHandler.setSocket(socket);
+
                 // start the sendReceive class
 //                Toast.makeText(getApplicationContext(), "Send Revieve started", Toast.LENGTH_SHORT).show();
-                sendReceive = new SendReceive(socket);
-                sendReceive.start();
+//                sendReceive = new SendReceive(socket);
+//                sendReceive.start();
             } catch (IOException e) {
                 e.printStackTrace();
             }
@@ -100,10 +106,13 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         public void run() {
             try {
                 socket.connect(new InetSocketAddress(hostAddress, PORT_USED), 500);
+
+                SocketHandler.setSocket(socket);
+
                 // start the sendReceive class
 //                Toast.makeText(getApplicationContext(), "Send Revieve started", Toast.LENGTH_SHORT).show();
-                sendReceive = new SendReceive(socket);
-                sendReceive.start();
+//                sendReceive = new SendReceive(socket);
+//                sendReceive.start();
             } catch (IOException e) {
                 e.printStackTrace();
             }
@@ -158,7 +167,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                 case MESSAGE_READ:
                     byte[] readBuff = (byte[]) msg.obj;
                     String tempMessage = new String(readBuff, 0, msg.arg1);
-                    readMsgBox.setText(tempMessage);
+                    readMsgBox.append("\n"+tempMessage);
                     break;
             }
             return true;
