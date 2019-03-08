@@ -37,7 +37,7 @@ public class ChatWindow extends AppCompatActivity {
 
         Socket socket = SocketHandler.getSocket();
 
-        SendReceive sendReceive = new SendReceive(socket);
+        final SendReceive sendReceive = new SendReceive(socket);
         sendReceive.start();
 
         final TextView enterMessage = findViewById(R.id.enterMessage);
@@ -51,15 +51,32 @@ public class ChatWindow extends AppCompatActivity {
         sendMessage.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                if (!enterMessage.getText().toString().equals("")) {
-                    updateUI("message", enterMessage.getText().toString());
+                if (enterMessage != null && !enterMessage.getText().toString().equals("")) {
+                    final String msg = enterMessage.getText().toString();
 
+                    //
+                    Thread thread = new Thread(new Runnable() {
+                        @Override
+                        public void run() {
+                            sendReceive.write(msg.getBytes());
+                            runOnUiThread(new Runnable() {
+
+                                @Override
+                                public void run() {
+                                    // Stuff that updates the UI
+                                    updateUI("message", enterMessage.getText().toString());
+                                }
+                            });
+                        }
+                    });
+                    thread.start();
                 }
                 scrollToBottom();
             }
         });
 
     }
+
 
     private void scrollToBottom(){
         scrollView.post(new Runnable() {

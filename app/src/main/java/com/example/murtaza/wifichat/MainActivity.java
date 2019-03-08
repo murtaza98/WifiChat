@@ -79,9 +79,11 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                 serverSocket = new ServerSocket(PORT_USED);
                 socket = serverSocket.accept();
 
+                SocketHandler.setSocket(socket);
+
                 startActivity(new Intent(getApplicationContext(), ChatWindow.class));
 
-                SocketHandler.setSocket(socket);
+
 
                 // start the sendReceive class
 //                Toast.makeText(getApplicationContext(), "Send Revieve started", Toast.LENGTH_SHORT).show();
@@ -108,6 +110,8 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                 socket.connect(new InetSocketAddress(hostAddress, PORT_USED), 500);
 
                 SocketHandler.setSocket(socket);
+
+                startActivity(new Intent(getApplicationContext(), ChatWindow.class));
 
                 // start the sendReceive class
 //                Toast.makeText(getApplicationContext(), "Send Revieve started", Toast.LENGTH_SHORT).show();
@@ -285,6 +289,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                 for(WifiP2pDevice device : peersList.getDeviceList()){
                     deviceNameArray[index] = device.deviceName;
                     deviceArray[index] = device;
+                    index++;
                 }
 
                 ArrayAdapter<String> adapter = new ArrayAdapter<>(getApplicationContext(), android.R.layout.simple_list_item_1, deviceNameArray);
